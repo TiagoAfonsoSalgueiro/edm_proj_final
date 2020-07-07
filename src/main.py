@@ -1,10 +1,13 @@
-import random
+from random import randint
 from machine import UART, Pin, DAC, deepsleep
 from utime import sleep, ticks_ms
 import struct
-from math import cos, pi
+#from math import cos, pi
 from esp32 import wake_on_ext1
 from MicroWebSrv2 import MicroWebSrv2
+import urequests
+
+print("Your public IP address is: ", urequests.get('https://api.ipify.org').text)
 
 uart = UART(1, 115200)
 uart.init(115200, bits=8, parity=None, stop=1, tx=15, rx=2)
@@ -38,6 +41,7 @@ def OnWebSocketAccepted(microWebSrv2, webSocket):
         myWebSockets = webSocket
         myWebSockets.OnTextMessage = OnWebSocketTextMsg
         myWebSockets.OnClosed = OnWebSocketClosed
+
 mws2 = MicroWebSrv2()
 wsMod = MicroWebSrv2.LoadModule('WebSockets')
 wsMod.OnWebSocketAccepted = OnWebSocketAccepted
@@ -45,20 +49,10 @@ mws2.SetEmbeddedConfig()
 mws2.NotFoundURL = '/'
 mws2.StartManaged()
 
-
+c=0
 try:
+    print('aaaaaaaaaaaaaaaa',mws2.IsRunning)
     while mws2.IsRunning:
-        #devido aos problemas que surgiram, foi preciso testar com valores aleatórios:
-        k = random.randint(0, 97)
-        d = open('www/dist.txt','w')
-        d.write(k)
-        d.close()
-
-        print(k)
-        s = open('www/dist.txt','w')
-        s.write(k)
-        s.close()
-
         # deepsleep button
         if nap.value()==False:
             print("Going to sleep...")
@@ -80,14 +74,20 @@ try:
         mysum = (sum(data[0:7]) + 0x59) & 0xFF
         if mysum != checksum:
             continue
-        
-        #d = open('www/dist.txt','w')
-        #d.write(dist)
-        #d.close()
 
-        #s = open('www/dist.txt','w')
-        #s.write(strength)
-        #s.close()
+        c+=1
+        if c%100==0:
+            print('Distance: ',dist)
+            print('Strength: ',strength)
+            
+            if dist<801:
+                d = open('www/dist.txt','w')
+                d.write(str(dist).encode('ascii'))
+                d.close()
+
+                s = open('www/strength.txt','w')
+                s.write(str(strength).encode('ascii'))
+                s.close()
 
         # leds for signal strength
         red.value(False)

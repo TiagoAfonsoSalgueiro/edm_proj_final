@@ -1,4 +1,4 @@
-from secrets import ssid, password
+from credentials import ssid, password
 import network
 def do_connect():
   wlan = network.WLAN(network.STA_IF)
