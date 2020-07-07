@@ -47,23 +47,22 @@ var chartD = new Highcharts.Chart({
   },
   credits: { enabled: false }
 });
-setInterval(function ( ) {
-  var xhttp = new XMLHttpRequest();
-  xhttp.onreadystatechange = function() {
-    if (this.readyState == 4 && this.status == 200) {
-      var x = (new Date()).getTime(),
-          y = parseFloat(this.responseText);
-      //console.log(this.responseText);
-      if(chartD.series[0].data.length > 40) {
-        chartD.series[0].addPoint([x, y], true, true, true);
-      } else {
-        chartD.series[0].addPoint([x, y], true, false, true);
-      }
-    }
-  };
-  xhttp.open("GET", "/dist.txt", true);
-  xhttp.send();
-}, 500 ) ;
+setInterval(async () => {
+  const chunk = await fetch(
+    "/dist.txt", 
+    {cache: 'no-cache'},
+  ).then(r => r.text());
+
+  const x = Date.now();
+  const y = parseFloat(chunk);
+  const [series] = chartD.series;
+  series.addPoint(
+    [x, y],
+    true,
+    series.data.length > 40,
+    true,
+  );
+}, 500);
 
 var chartS = new Highcharts.Chart({
   chart:{ renderTo:'chart-strength' },

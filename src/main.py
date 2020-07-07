@@ -30,7 +30,7 @@ wake_on_ext1(pins = [wake], level = Pin.WAKE_HIGH)
 myWebSockets = None
 def OnWebSocketTextMsg(webSocket, msg):
     print('Received message: {0}'.format(msg))
-    red.value(True if msg == "red LED ON" else False)
+    red.value(True if msg == "RED LED ON" else False)
 def OnWebSocketClosed(webSocket):
     global myWebSockets
     myWebSockets = None
@@ -51,7 +51,6 @@ mws2.StartManaged()
 
 c=0
 try:
-    print('aaaaaaaaaaaaaaaa',mws2.IsRunning)
     while mws2.IsRunning:
         # deepsleep button
         if nap.value()==False:
@@ -115,6 +114,7 @@ try:
         # dac.write(int(127.5+127.5*cos(2*pi*freq*t)))
         # if t>Tms:
         #     cycle=True
+
 except KeyboardInterrupt:
     pass
 red.value(False)
